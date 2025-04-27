@@ -1,24 +1,31 @@
+//* Importa los módulos necesarios
 import express from 'express';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
+import router from './router';
 import cors from 'cors';
-import router from './routes/customers.routes';
 
+//* Inicializa la aplicación Express
+const app = express();
 dotenv.config();
 
-const app = express();
-const port = process.env.NODE_PORT || 5000;
+//* Configura el puerto del servidor
+const port = process.env.NODE_PORT;
 
+//* Middleware para registro de solicitudes HTTP
 app.use(morgan('dev'));
+
+//* Habilita CORS para todas las solicitudes
 app.use(cors());
+
+//* Middleware para parsear los datos JSON y de formularios
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Rutas
-app.use('/customers', router);
+//* Asocia las rutas definidas en el archivo router.js
+router(app);
 
-// Iniciar el servidor
+//* Inicia el servidor
 app.listen(port, () => {
     console.log(`Servidor corriendo en el puerto ${port}`);
 });
-
