@@ -38,12 +38,13 @@ module.exports = {
 {
     "presets": [
         [
-            "@babel/preset-env",
+            "@babel/preset-env",  // Usamos el preset de Babel para convertir el código a una versión compatible con Node.js
             {
                 "targets": {
-                    "node": "12.13.1"
+                    "esmodules": false   // Deshabilita el soporte para módulos ES6
                 }
             }
         ]
     ]
 }
+
