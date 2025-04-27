@@ -1,114 +1,125 @@
 import dbConnection from '../database/dbConnection';
 
+// Obtener todos los clientes
 export const getCustomers = (req, res) => {
-
-    let sqlQuery = 'SELECT * FROM customers';
+    const sqlQuery = 'SELECT * FROM customers';
 
     dbConnection.query(sqlQuery, (error, results) => {
-        if (error) throw error;
+        if (error) {
+            console.error('Error al obtener los clientes:', error);
+            return res.status(500).json({ error: 'Error en la base de datos' });
+        }
         res.status(200).json(results);
     });
 };
 
+// Obtener cliente por ID
 export const getCustomersById = (req, res) => {
-
     const id = parseInt(req.params.id);
-    let sqlQuery = `SELECT * FROM customers WHERE id = ${id}`;
 
-    // This method verifies that the id passed by parameter is a number, if it is not, it sends an error message
+    // Validación de ID
     if (isNaN(id)) {
-        return res.json('You must enter a valid id as a parameter');
+        return res.status(400).json({ error: 'El ID debe ser un número válido' });
     }
 
+    const sqlQuery = `SELECT * FROM customers WHERE id = ${id}`;
+
     dbConnection.query(sqlQuery, (error, result) => {
-        if (error) throw error;
+        if (error) {
+            console.error('Error al obtener el cliente:', error);
+            return res.status(500).json({ error: 'Error en la base de datos' });
+        }
+        if (result.length === 0) {
+            return res.status(404).json({ message: 'Cliente no encontrado' });
+        }
         res.status(200).json(result[0]);
     });
 };
 
+// Crear un nuevo cliente
 export const createNewCustomer = (req, res) => {
+    const { first_name, last_name, email, age } = req.body;
 
-    // Declare that I store the request body in a constant
-    const customer = req.body;
-    // So, I create the object with the table fields by calling the constant customer
-    const customerObj = [
-        customer.first_name,
-        customer.last_name,
-        customer.email,
-        customer.age
-    ];
-
-    // This method verifies that the request body has all the complete fields, otherwise the operation will not be executed and sends an error message
-    if (!customer.first_name || !customer.last_name || !customer.email || !customer.age) {
-        return res.json({
-            ErrorCode: 204,
-            Message: 'Fields cannot be empty'
+    // Validación de campos vacíos
+    if (!first_name || !last_name || !email || !age) {
+        return res.status(400).json({
+            error: 'Todos los campos son obligatorios (first_name, last_name, email, age)',
         });
     }
 
-    let sqlQuery = 'INSERT INTO customers (first_name, last_name, email, age) VALUES ( ?,?,?,? )';
+    const customerObj = [first_name, last_name, email, age];
+    const sqlQuery = 'INSERT INTO customers (first_name, last_name, email, age) VALUES (?, ?, ?, ?)';
 
     dbConnection.query(sqlQuery, customerObj, (err, result) => {
-        if (err) throw err;
-        res.status(201).json('Customer created with id: ' + result.insertId);
+        if (err) {
+            console.error('Error al crear cliente:', err);
+            return res.status(500).json({ error: 'Error al crear el cliente' });
+        }
+        res.status(201).json({ message: `Cliente creado con ID: ${result.insertId}` });
     });
 };
 
+// Actualizar cliente
 export const updateCustomer = (req, res) => {
-    
     const id = parseInt(req.params.id);
-    const customer = req.body;
-    const customerObj = [
-        customer.first_name,
-        customer.last_name,
-        customer.email,
-        customer.age
-    ];
+    const { first_name, last_name, email, age } = req.body;
 
+    // Validación de ID
     if (isNaN(id)) {
-        return res.json('You must enter a valid id as a parameter');
+        return res.status(400).json({ error: 'El ID debe ser un número válido' });
     }
 
-    if (!customer.first_name || !customer.last_name || !customer.email || !customer.age) {
-        return res.json({
-            ErrorCode: 204,
-            Message: 'Fields cannot be empty'
+    // Validación de campos vacíos
+    if (!first_name || !last_name || !email || !age) {
+        return res.status(400).json({
+            error: 'Todos los campos son obligatorios (first_name, last_name, email, age)',
         });
     }
 
-    let sqlQuery = `UPDATE customers SET first_name = ?, last_name = ?, email = ?, age = ? WHERE id = ${id}`
+    const customerObj = [first_name, last_name, email, age];
+    const sqlQuery = `UPDATE customers SET first_name = ?, last_name = ?, email = ?, age = ? WHERE id = ${id}`;
 
-    dbConnection.query(sqlQuery, customerObj,  (error, result) => {
-        if (error) throw error;
-        if (result.affectedRow === 0) {
-            res.send('No customer was updated');
+    dbConnection.query(sqlQuery, customerObj, (error, result) => {
+        if (error) {
+            console.error('Error al actualizar el cliente:', error);
+            return res.status(500).json({ error: 'Error al actualizar el cliente' });
         }
-        res.json(`Customer with id ${id} updated successfully`);
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'Cliente no encontrado' });
+        }
+        res.status(200).json({ message: `Cliente con ID ${id} actualizado exitosamente` });
     });
 };
 
+// Eliminar un cliente por ID
 export const deleteOneCustomer = (req, res) => {
-
     const id = parseInt(req.params.id);
 
+    // Validación de ID
     if (isNaN(id)) {
-        return res.json('You must enter a valid id as a parameter');
+        return res.status(400).json({ error: 'El ID debe ser un número válido' });
     }
-    
-    let sqlQuery = `DELETE FROM customers WHERE id = ${id}`;
 
-    dbConnection.query(sqlQuery, error => {
-        if (error) throw error; 
-        res.status(200).json(`Customer with id ${id} deleted successfully`);
+    const sqlQuery = `DELETE FROM customers WHERE id = ${id}`;
+
+    dbConnection.query(sqlQuery, (error) => {
+        if (error) {
+            console.error('Error al eliminar el cliente:', error);
+            return res.status(500).json({ error: 'Error al eliminar el cliente' });
+        }
+        res.status(200).json({ message: `Cliente con ID ${id} eliminado exitosamente` });
     });
 };
 
+// Eliminar todos los clientes
 export const deleteAllCustomers = (req, res) => {
+    const sqlQuery = 'TRUNCATE TABLE customers';
 
-    let sqlQuery = 'TRUNCATE TABLE customers';
-
-    dbConnection.query(sqlQuery, error => {
-        if (error) throw error; 
-        res.status(200).json('All records have been erased');
+    dbConnection.query(sqlQuery, (error) => {
+        if (error) {
+            console.error('Error al eliminar todos los clientes:', error);
+            return res.status(500).json({ error: 'Error al eliminar los clientes' });
+        }
+        res.status(200).json({ message: 'Todos los registros de clientes han sido eliminados' });
     });
 };
