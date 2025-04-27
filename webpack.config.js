@@ -34,3 +34,16 @@ module.exports = {
 
     devtool: 'inline-source-map',
 };
+
+{
+    "presets": [
+        [
+            "@babel/preset-env",
+            {
+                "targets": {
+                    "node": "12.13.1"
+                }
+            }
+        ]
+    ]
+}
