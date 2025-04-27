@@ -1,20 +1,14 @@
-/* 
-* This query check if there is a schema called test or not 
-*/
+-- Crear el esquema 'test_db' si no existe
 CREATE SCHEMA IF NOT EXISTS test_db;
 
-/*
-* This query check if there is a table called customers, and if exist will be deleted
-*/
+-- Eliminar la tabla 'customers' si existe
 DROP TABLE IF EXISTS customers;
 
-/*
-* But if the table doesn't exist this query will create it with the data that we specify below
-*/
+-- Crear la tabla 'customers' si no existe
 CREATE TABLE IF NOT EXISTS customers (
-	id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, 
-    first_name VARCHAR(50) NOT NULL,
-    last_name VARCHAR(50) NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL, 
-    age INT DEFAULT 0
+    id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, -- Definir la columna 'id' como clave primaria y autoincrementable
+    first_name VARCHAR(50) NOT NULL, -- Definir la columna 'first_name' para almacenar el primer nombre, no puede ser nula
+    last_name VARCHAR(50) NOT NULL, -- Definir la columna 'last_name' para almacenar el apellido, no puede ser nula
+    email VARCHAR(100) UNIQUE NOT NULL, -- Definir la columna 'email' para almacenar el correo electrónico, debe ser único y no nula
+    age INT DEFAULT 0 -- Definir la columna 'age' para almacenar la edad, con un valor predeterminado de 0
 );
