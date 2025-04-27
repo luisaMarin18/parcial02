@@ -1,28 +1,22 @@
-require('dotenv').config();
 import mysql from 'mysql';
+import dotenv from 'dotenv';
 
-const dbConnection =  mysql.createConnection ({
+dotenv.config();
+
+const dbConnection = mysql.createConnection({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
-    password:process.env.DB_PASSWORD,
+    password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
     port: process.env.DB_PORT,
 });
 
 dbConnection.connect((error) => {
     if (error) {
-        if (error.code === 'PROTOCOL_CONNECTION_LOST') {
-            console.error('Database connection was closed.');
-        }
-        if (error.code === 'ER_CON_COUNT_ERROR') {
-            console.error('Database has too many connections.');
-        }
-        if (error.code === 'ECONNREFUSED') {
-            console.error('Database connection was refused.');
-        }
-    } else {
-        console.log('Database connected');
+        console.error('Error en la conexión con la base de datos:', error);
+        return;
     }
+    console.log('Conexión a la base de datos exitosa');
 });
 
 export default dbConnection;
