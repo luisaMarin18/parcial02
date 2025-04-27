@@ -1,9 +1,9 @@
-//* Import the customers.routes file with all de methods
+//* Importa las rutas de los clientes
 import customerRoutes from './routes/customers.routes';
 
-//* Here I defined the first endpoint
+//* Aquí definimos el primer endpoint
 const router = (app) => {
-    app.use('/customers', customerRoutes);
+    app.use('/customers', customerRoutes); // Ruta para las operaciones CRUD de los clientes
 };
 
 export default router;
